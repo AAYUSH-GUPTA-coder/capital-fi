@@ -7,3 +7,6 @@
 [submodule "Foundry/lib/ccip"]
 	path = Foundry/lib/ccip
 	url = https://github.com/smartcontractkit/ccip
+[submodule "Foundry/lib/chainlink"]
+	path = Foundry/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink
