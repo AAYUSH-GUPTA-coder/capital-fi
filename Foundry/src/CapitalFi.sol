@@ -19,7 +19,12 @@ error FAILED_TO_RECEIVED();
 error AMOUNT_CANT_BE_ZERO();
 error NOT_ENOUGH_SHARES();
 error FAILED_TO_TRANSFER();
-error CapitalFi_onlyOwnerCanCall(address caller);
+error CapitalFi__onlyOwnerCanCall(address caller);
+error CapitalFi__onlyWhitelistedAddr(address caller);
+error CapitalFi__NotEnoughLinkBalance(
+    uint256 currentBalance,
+    uint256 calculatedFees
+);
 
 contract CapitalFi is ERC20 {
     using Math for uint256;
@@ -27,10 +32,12 @@ contract CapitalFi is ERC20 {
     IPoolAddressesProvider private immutable addressesProvider;
     IPool private immutable pool;
     uint256 public constant PRECISION = 1e6;
-    uint256 public totalPool;
+    uint256 public totalProtocolValue;
     address private owner;
     address private immutable i_router;
     address private immutable i_link;
+
+    mapping(address => bool) public isWhitelisted;
 
     event LendMessageSent(
         bytes32 messageId,
@@ -42,7 +49,13 @@ contract CapitalFi is ERC20 {
     );
 
     modifier onlyOwner() {
-        if (msg.sender != owner) revert CapitalFi_onlyOwnerCanCall(msg.sender);
+        if (msg.sender != owner) revert CapitalFi__onlyOwnerCanCall(msg.sender);
+        _;
+    }
+
+    modifier onlyWhiteListed(address _caller) {
+        if (isWhitelisted[_caller] != true)
+            revert CapitalFi__onlyWhitelistedAddr(msg.sender);
         _;
     }
 
@@ -80,20 +93,20 @@ contract CapitalFi is ERC20 {
             sharesToMint = _amount;
         } else {
             // Calculate shares based on the current pool size
-            sharesToMint = (_amount * totalSupply()) / totalPool;
+            sharesToMint = (_amount * totalSupply()) / totalProtocolValue;
         }
 
         // Update the total pool size
-        totalPool += _amount;
+        totalProtocolValue += _amount;
 
         // Mint shares to the user
         _mint(msg.sender, sharesToMint);
     }
 
     // function just for testing
-    function updatePool(uint256 newPoolSize) external {
-        require(newPoolSize >= totalPool, "Pool size can only increase");
-        totalPool = newPoolSize;
+    // This function is need to be updated by beckend server
+    function updateProtocolValue(uint256 _newPoolSize) external {
+        totalProtocolValue = _newPoolSize;
     }
 
     /**
@@ -103,21 +116,30 @@ contract CapitalFi is ERC20 {
      */
     function withdraw(
         address _token,
+        address _aToken,
         uint256 _shares
     ) external returns (uint256) {
         if (_shares == 0) revert AMOUNT_CANT_BE_ZERO();
         if (balanceOf(msg.sender) < _shares) revert NOT_ENOUGH_SHARES();
 
-        uint256 amountToWithdraw = (_shares * totalPool) / totalSupply();
+        uint256 amountToWithdraw = (_shares * totalProtocolValue) /
+            totalSupply();
 
         // Burn the user's shares
         _burn(msg.sender, _shares);
 
         // Update the total pool size
-        totalPool -= amountToWithdraw;
+        totalProtocolValue -= amountToWithdraw;
 
-        // Transfer USDC back to the user
-        IERC20(_token).transfer(msg.sender, amountToWithdraw);
+        if (amountToWithdraw <= IERC20(_token).balanceOf(address(this))) {
+            // Transfer USDC back to the user
+            IERC20(_token).transfer(msg.sender, amountToWithdraw);
+        } else if (
+            amountToWithdraw <= IERC20(_aToken).balanceOf(address(this))
+        ) {
+            pool.withdraw(_token, amountToWithdraw, address(this));
+            IERC20(_token).transfer(msg.sender, amountToWithdraw);
+        } else {}
 
         return amountToWithdraw;
     }
@@ -139,6 +161,7 @@ contract CapitalFi is ERC20 {
     /**
      * @notice function to withdraw Protocol USDC from the Defi protocol (currently only aave)
      * @param _token address of the USDC
+     * @param _aTokenAddr address of aToken / Lend Token
      */
     function withdrawFromDefi(address _token, address _aTokenAddr) public {
         uint totalAtokenBalance = IERC20(_aTokenAddr).balanceOf(address(this));
@@ -146,22 +169,27 @@ contract CapitalFi is ERC20 {
     }
 
     /**
-     * @notice function to bride the tokens to different chain and call the SupplyToDefi function on that chain
+     * @notice function to bride the tokens to different chain and call the SupplyToDefi function on that chain.
+     * @dev This function will work when our Protocol have token
      * @param _token address of usdc
      * @param _receiver address of the receiver contract address (CapitalFiGateway)
      * @param _gasFeeAmount gas required to execute this function
      * @param _destinationChainSelector ccip-chain ID of destination chain
+     * NOTES: need onlyWhiteListed() address can call
      */
     function bridgeAndSupplyToDefi(
         address _token,
         address _receiver,
         uint256 _gasFeeAmount,
         uint64 _destinationChainSelector
-    ) public {
-        // create token amounts
+    ) public onlyWhiteListed(msg.sender) returns (bytes32 messageId) {
+        // get the balance of USDC in this protocol
+        uint256 totalBalance = getContractErc20Balance(_token);
+
+        // Create an EVM2AnyMessage struct in memory
         Client.EVMTokenAmount[] memory tokenAmounts = getTokenAmountMessage(
             _token,
-            getContractErc20Balance(_token)
+            totalBalance
         );
 
         // create client message
@@ -181,13 +209,19 @@ contract CapitalFi is ERC20 {
             message
         );
 
+        if (fee > IERC20(i_link).balanceOf(address(this)))
+            revert CapitalFi__NotEnoughLinkBalance(
+                IERC20(i_link).balanceOf(address(this)),
+                fee
+            );
+
         bytes32 messageId;
 
         // approve router contract to use LINK token
         LinkTokenInterface(i_link).approve(i_router, fee);
 
         // approve router contract to use USDC token
-        IERC20(_token).approve(i_router, getContractErc20Balance(_token));
+        IERC20(_token).approve(i_router, totalBalance);
 
         // execute the action
         messageId = IRouterClient(i_router).ccipSend(
@@ -198,10 +232,38 @@ contract CapitalFi is ERC20 {
         emit LendMessageSent(
             messageId,
             _token,
-            getContractErc20Balance(_token),
+            totalBalance,
             _destinationChainSelector,
             _receiver,
             _gasFeeAmount
+        );
+
+        // Return the message ID
+        return messageId;
+    }
+
+    /**
+     * @notice function to withdraw the tokens from AAVE protocol, bride the tokens to different chain and call the SupplyToDefi function on that chain.
+     * @dev This function will work when our selected defi Protocol have tokens
+     * @param _token address of usdc
+     * @param _receiver address of the receiver contract address (CapitalFiGateway)
+     * @param _gasFeeAmount gas required to execute this function
+     * @param _destinationChainSelector ccip-chain ID of destination chain
+     * NOTES: need onlyWhiteListed() address can call
+     */
+    function withdrawBridgeAndSupply(
+        address _token,
+        address _receiver,
+        uint256 _gasFeeAmount,
+        uint64 _destinationChainSelector,
+        address _aToken
+    ) public {
+        withdrawFromDefi(_token, _aToken);
+        bridgeAndSupplyToDefi(
+            _token,
+            _receiver,
+            _gasFeeAmount,
+            _destinationChainSelector
         );
     }
 
@@ -218,8 +280,24 @@ contract CapitalFi is ERC20 {
         return tokenAmounts;
     }
 
+    function setWhitelist(address _whitelist) external onlyOwner {
+        isWhitelisted[_whitelist] = true;
+    }
+
     function getTotalPool() external view returns (uint256) {
-        return totalPool;
+        return totalProtocolValue;
+    }
+
+    function getOwnerAddr() public view returns (address) {
+        return owner;
+    }
+
+    function getRouterAddress() public view returns (address) {
+        return i_router;
+    }
+
+    function getLinkAddress() public view returns (address) {
+        return i_link;
     }
 
     /**
@@ -233,4 +311,6 @@ contract CapitalFi is ERC20 {
     }
 }
 
-// Ideally TotalPoolValue / totalPool = will be Amount in defi protocols in usd terms + value of pool in usd term. the problem is we have Pool in different chains, so also need to track that
+// Ideally TotalPoolValue / totalProtocolValue = will be Amount in defi protocols in usd terms + value of pool in usd term. the problem is we have Pool in different chains, so also need to track that
+
+// ! check totalProtocolValue again, after completing smart contract
