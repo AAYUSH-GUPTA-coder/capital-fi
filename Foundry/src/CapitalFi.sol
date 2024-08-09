@@ -13,8 +13,9 @@ import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interface
 
 error CapitalFi__FailedToReceived();
 error CapitalFi__AmountCantBeZero();
+error CapitalFi__AddressCantBeZero();
 error CapitalFi__NotEnoughShares();
-error CapitalFi__OnlyOwnerCanCall(address caller);
+error CapitalFi__OnlyOwnerCanCall(address caller, address owner);
 error CapitalFi__OnlyWhitelistedAddr(address caller);
 error CapitalFi__NotEnoughLinkBalance(
     uint256 currentBalance,
@@ -24,7 +25,6 @@ error CapitalFi__NotEnoughLinkBalance(
 contract CapitalFi is ERC20 {
     IPoolAddressesProvider private immutable addressesProvider;
     IPool private immutable pool;
-    uint256 public constant PRECISION = 1e6;
     uint256 public totalProtocolValue;
     address private owner;
     address private immutable i_router;
@@ -32,6 +32,7 @@ contract CapitalFi is ERC20 {
 
     mapping(address => bool) public isWhitelisted;
 
+    event SetOwner(address oldOwner, address NewOnwer);
     event LendMessageSent(
         bytes32 messageId,
         address token,
@@ -42,7 +43,8 @@ contract CapitalFi is ERC20 {
     );
 
     modifier onlyOwner() {
-        if (msg.sender != owner) revert CapitalFi__OnlyOwnerCanCall(msg.sender);
+        if (msg.sender != owner)
+            revert CapitalFi__OnlyOwnerCanCall(msg.sender, owner);
         _;
     }
 
@@ -63,6 +65,16 @@ contract CapitalFi is ERC20 {
         i_link = _link;
         addressesProvider = IPoolAddressesProvider(_addressProvider);
         pool = IPool(addressesProvider.getPool());
+    }
+
+    /**
+     * @notice function to set the new owner
+     * @param _owner address of the owner
+     */
+    function setOwner(address _owner) external onlyOwner {
+        if (_owner == address(0)) revert CapitalFi__AddressCantBeZero();
+        owner = _owner;
+        emit SetOwner(msg.sender, _owner);
     }
 
     /**
@@ -209,7 +221,7 @@ contract CapitalFi is ERC20 {
                 fee
             );
 
-        bytes32 messageId;
+        // bytes32 messageId;
 
         // approve router contract to use LINK token
         LinkTokenInterface(i_link).approve(i_router, fee);
