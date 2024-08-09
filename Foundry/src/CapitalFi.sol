@@ -6,7 +6,6 @@ import {IPoolAddressesProvider} from "./interfaces/aave/IPoolAddressesProvider.s
 import {IPool} from "./interfaces/aave/IPool.sol";
 import {DataTypes} from "./interfaces/aave/DataTypes.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {OwnerIsCreator} from "@chainlink/contracts-ccip/src/v0.8/shared/access/OwnerIsCreator.sol";
@@ -27,8 +26,6 @@ error CapitalFi__NotEnoughLinkBalance(
 );
 
 contract CapitalFi is ERC20 {
-    using Math for uint256;
-
     IPoolAddressesProvider private immutable addressesProvider;
     IPool private immutable pool;
     uint256 public constant PRECISION = 1e6;
