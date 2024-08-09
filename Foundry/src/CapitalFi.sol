@@ -11,12 +11,11 @@ import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
 
-error FAILED_TO_RECEIVED();
-error AMOUNT_CANT_BE_ZERO();
-error NOT_ENOUGH_SHARES();
-error FAILED_TO_TRANSFER();
-error CapitalFi__onlyOwnerCanCall(address caller);
-error CapitalFi__onlyWhitelistedAddr(address caller);
+error CapitalFi__FailedToReceived();
+error CapitalFi__AmountCantBeZero();
+error CapitalFi__NotEnoughShares();
+error CapitalFi__OnlyOwnerCanCall(address caller);
+error CapitalFi__OnlyWhitelistedAddr(address caller);
 error CapitalFi__NotEnoughLinkBalance(
     uint256 currentBalance,
     uint256 calculatedFees
@@ -43,13 +42,13 @@ contract CapitalFi is ERC20 {
     );
 
     modifier onlyOwner() {
-        if (msg.sender != owner) revert CapitalFi__onlyOwnerCanCall(msg.sender);
+        if (msg.sender != owner) revert CapitalFi__OnlyOwnerCanCall(msg.sender);
         _;
     }
 
     modifier onlyWhiteListed(address _caller) {
         if (isWhitelisted[_caller] != true)
-            revert CapitalFi__onlyWhitelistedAddr(msg.sender);
+            revert CapitalFi__OnlyWhitelistedAddr(msg.sender);
         _;
     }
 
@@ -72,13 +71,13 @@ contract CapitalFi is ERC20 {
      * @param _amount amount to be deposited
      */
     function deposit(address _token, uint256 _amount) external {
-        if (_amount == 0) revert AMOUNT_CANT_BE_ZERO();
+        if (_amount == 0) revert CapitalFi__AmountCantBeZero();
         bool receiveToken = IERC20(_token).transferFrom(
             msg.sender,
             address(this),
             _amount
         );
-        if (!receiveToken) revert FAILED_TO_RECEIVED();
+        if (!receiveToken) revert CapitalFi__FailedToReceived();
 
         uint256 sharesToMint;
 
@@ -113,8 +112,9 @@ contract CapitalFi is ERC20 {
         address _aToken,
         uint256 _shares
     ) external returns (uint256) {
-        if (_shares == 0) revert AMOUNT_CANT_BE_ZERO();
-        if (balanceOf(msg.sender) < _shares) revert NOT_ENOUGH_SHARES();
+        if (_shares == 0) revert CapitalFi__AmountCantBeZero();
+        if (balanceOf(msg.sender) < _shares)
+            revert CapitalFi__NotEnoughShares();
 
         uint256 amountToWithdraw = (_shares * totalProtocolValue) /
             totalSupply();
