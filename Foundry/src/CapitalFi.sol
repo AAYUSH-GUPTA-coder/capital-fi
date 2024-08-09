@@ -27,12 +27,12 @@ contract CapitalFi is ERC20 {
     IPool private immutable pool;
     uint256 public totalProtocolValue;
     address private owner;
-    address private immutable i_router;
+    address private immutable i_ccipRouter;
     address private immutable i_link;
 
     mapping(address => bool) public isWhitelisted;
 
-    event SetOwner(address oldOwner, address NewOnwer);
+    event SetOwner(address oldOwner, address NewOwner);
     event LendMessageSent(
         bytes32 messageId,
         address token,
@@ -40,6 +40,15 @@ contract CapitalFi is ERC20 {
         uint64 destinationChainSelector,
         address receiver,
         uint256 gasFeeAmount
+    );
+    event UpdatedProtocolValue(uint256 TotalProtocolValue);
+    event SuppliedToDefi(address Token, uint256 TotalTokenBalance);
+    event WithdrawedFromDefi(address Token, uint256 totalAtokenBalance);
+    event WithdrawBridgeAndSupplied(
+        address Token,
+        address Receiver,
+        uint256 GasFeesAmount,
+        uint64 DestinationChainSelector
     );
 
     modifier onlyOwner() {
@@ -61,7 +70,7 @@ contract CapitalFi is ERC20 {
         address _addressProvider
     ) ERC20("CAPITALFI", "CAP") {
         owner = _owner;
-        i_router = _ccipRouter;
+        i_ccipRouter = _ccipRouter;
         i_link = _link;
         addressesProvider = IPoolAddressesProvider(_addressProvider);
         pool = IPool(addressesProvider.getPool());
@@ -82,7 +91,7 @@ contract CapitalFi is ERC20 {
      * @param _token address of the USDC
      * @param _amount amount to be deposited
      */
-    function deposit(address _token, uint256 _amount) external {
+    function userDeposit(address _token, uint256 _amount) external {
         if (_amount == 0) revert CapitalFi__AmountCantBeZero();
         bool receiveToken = IERC20(_token).transferFrom(
             msg.sender,
@@ -108,18 +117,25 @@ contract CapitalFi is ERC20 {
         _mint(msg.sender, sharesToMint);
     }
 
-    // function just for testing
-    // This function is need to be updated by beckend server
-    function updateProtocolValue(uint256 _newPoolSize) external {
+    /**
+     * @notice function to update the totalProtocolValue
+     * @dev This function is need to be updated by beckend server
+     * @param _newPoolSize new totalProtocolValue
+     */
+    function updateProtocolValue(
+        uint256 _newPoolSize
+    ) external onlyWhiteListed(msg.sender) {
         totalProtocolValue = _newPoolSize;
+        emit UpdatedProtocolValue(totalProtocolValue);
     }
 
     /**
      * @notice function to burn our protocol shares and give user USDC
      * @param _token address of USDC
+     * @param _aToken address of aUSDC
      * @param _shares amount of shares
      */
-    function withdraw(
+    function userWithdraw(
         address _token,
         address _aToken,
         uint256 _shares
@@ -145,7 +161,7 @@ contract CapitalFi is ERC20 {
         ) {
             pool.withdraw(_token, amountToWithdraw, address(this));
             IERC20(_token).transfer(msg.sender, amountToWithdraw);
-        } else {}
+        }
 
         return amountToWithdraw;
     }
@@ -162,6 +178,8 @@ contract CapitalFi is ERC20 {
 
         // Supply to Pool onbehalf of user
         pool.supply(_token, totalTokenBalance, address(this), 0);
+
+        emit SuppliedToDefi(_token, totalTokenBalance);
     }
 
     /**
@@ -172,6 +190,7 @@ contract CapitalFi is ERC20 {
     function withdrawFromDefi(address _token, address _aTokenAddr) public {
         uint totalAtokenBalance = IERC20(_aTokenAddr).balanceOf(address(this));
         pool.withdraw(_token, totalAtokenBalance, address(this));
+        emit WithdrawedFromDefi(_token, totalAtokenBalance);
     }
 
     /**
@@ -210,7 +229,7 @@ contract CapitalFi is ERC20 {
         });
 
         // calculate fees
-        uint256 fee = IRouterClient(i_router).getFee(
+        uint256 fee = IRouterClient(i_ccipRouter).getFee(
             _destinationChainSelector,
             message
         );
@@ -224,13 +243,13 @@ contract CapitalFi is ERC20 {
         // bytes32 messageId;
 
         // approve router contract to use LINK token
-        LinkTokenInterface(i_link).approve(i_router, fee);
+        LinkTokenInterface(i_link).approve(i_ccipRouter, fee);
 
         // approve router contract to use USDC token
-        IERC20(_token).approve(i_router, totalBalance);
+        IERC20(_token).approve(i_ccipRouter, totalBalance);
 
         // execute the action
-        messageId = IRouterClient(i_router).ccipSend(
+        messageId = IRouterClient(i_ccipRouter).ccipSend(
             _destinationChainSelector,
             message
         );
@@ -271,6 +290,12 @@ contract CapitalFi is ERC20 {
             _gasFeeAmount,
             _destinationChainSelector
         );
+        emit WithdrawBridgeAndSupplied(
+            _token,
+            _receiver,
+            _gasFeeAmount,
+            _destinationChainSelector
+        );
     }
 
     function getTokenAmountMessage(
@@ -286,22 +311,33 @@ contract CapitalFi is ERC20 {
         return tokenAmounts;
     }
 
+    /**
+     * @notice function to set whitelisted addresses
+     */
     function setWhitelist(address _whitelist) external onlyOwner {
         isWhitelisted[_whitelist] = true;
     }
 
+    // ----------------------------------- //
+    //      GETTER FUNCTIONS               //
+    // ----------------------------------  //
+
+    ///@notice function to get the total protocol value
     function getTotalPool() external view returns (uint256) {
         return totalProtocolValue;
     }
 
+    ///@notice function to get owner address
     function getOwnerAddr() public view returns (address) {
         return owner;
     }
 
+    ///@notice function to get the address of CCIP Router
     function getRouterAddress() public view returns (address) {
-        return i_router;
+        return i_ccipRouter;
     }
 
+    ///@notice function to get the address of LINK Token
     function getLinkAddress() public view returns (address) {
         return i_link;
     }
@@ -315,8 +351,17 @@ contract CapitalFi is ERC20 {
     ) public view returns (uint256) {
         return IERC20(_token).balanceOf(address(this));
     }
+
+    /**
+     * @notice get the user shares
+     * @param _user address of the user
+     */
+    function getUserShares(address _user) public view returns (uint256) {
+        return balanceOf(_user);
+    }
 }
 
 // Ideally TotalPoolValue / totalProtocolValue = will be Amount in defi protocols in usd terms + value of pool in usd term. the problem is we have Pool in different chains, so also need to track that
 
 // ! check totalProtocolValue again, after completing smart contract
+// ! TotalProtocolValue = usd deposited in aave + usdc in contract on OP + usdc in contract on Base
