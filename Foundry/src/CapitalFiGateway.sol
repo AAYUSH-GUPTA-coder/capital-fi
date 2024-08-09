@@ -6,9 +6,10 @@ import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.s
 import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-error FailedToWithdrawEth(address owner, uint256 amount);
-error CAPITALFI_GATEWAY_ERROR();
-error ONLY_OWNER_CALL_THIS_FUNCTION();
+error CapitalFiGateway__FailedToWithdrawEth(address owner, uint256 amount);
+error CapitalFiGateway__FailedToWithdrawErc20(address owner, uint256 amount);
+error CapitalFiGateway__CAPITALFI_GATEWAY_ERROR();
+error CapitalFiGateway__ONLY_OWNER_CALL_THIS_FUNCTION();
 
 contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
     address public capitalFiAddr;
@@ -16,7 +17,8 @@ contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
     address public owner;
 
     modifier onlyOwner(address _address) {
-        if (_address != owner) revert ONLY_OWNER_CALL_THIS_FUNCTION();
+        if (_address != owner)
+            revert CapitalFiGateway__ONLY_OWNER_CALL_THIS_FUNCTION();
         _;
     }
 
@@ -47,7 +49,7 @@ contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
 
         // Call the CapitalFi function
         (bool success, ) = capitalFiAddr.call(message.data);
-        if (!success) revert CAPITALFI_GATEWAY_ERROR();
+        if (!success) revert CapitalFiGateway__CAPITALFI_GATEWAY_ERROR();
     }
 
     /// @notice Fallback function to allow the contract to receive Ether.
@@ -57,7 +59,8 @@ contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
     function withdraw() public onlyOwner(msg.sender) {
         uint256 amount = address(this).balance;
         (bool sent, ) = msg.sender.call{value: amount}("");
-        if (!sent) revert FailedToWithdrawEth(msg.sender, amount);
+        if (!sent)
+            revert CapitalFiGateway__FailedToWithdrawEth(msg.sender, amount);
     }
 
     /**
@@ -66,6 +69,8 @@ contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
      */
     function withdrawToken(address token) public onlyOwner(msg.sender) {
         uint256 amount = IERC20(token).balanceOf(address(this));
-        IERC20(token).transfer(msg.sender, amount);
+        bool sent = IERC20(token).transfer(msg.sender, amount);
+        if (!sent)
+            revert CapitalFiGateway__FailedToWithdrawErc20(msg.sender, amount);
     }
 }
