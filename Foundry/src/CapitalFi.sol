@@ -11,8 +11,6 @@ import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
 
-import "forge-std/console.sol";
-
 error FAILED_TO_RECEIVED();
 error AMOUNT_CANT_BE_ZERO();
 error NOT_ENOUGH_SHARES();
