@@ -87,6 +87,13 @@ contract CapitalFi is ERC20 {
     }
 
     /**
+     * @notice function to set whitelisted addresses
+     */
+    function setWhitelist(address _whitelist) external onlyOwner {
+        isWhitelisted[_whitelist] = true;
+    }
+
+    /**
      * @notice function to receive USDC from the user. User will get back protocol shares
      * @param _token address of the USDC
      * @param _amount amount to be deposited
@@ -271,7 +278,7 @@ contract CapitalFi is ERC20 {
      * @notice function to withdraw the tokens from AAVE protocol, bride the tokens to different chain and call the SupplyToDefi function on that chain.
      * @dev This function will work when our selected defi Protocol have tokens
      * @param _token address of usdc
-     * @param _receiver address of the receiver contract address (CapitalFiGateway)
+     * @param _receiver address of the receiver contract address (CapitalFiGateway on destination chains)
      * @param _gasFeeAmount gas required to execute this function
      * @param _destinationChainSelector ccip-chain ID of destination chain
      * NOTES: need onlyWhiteListed() address can call
@@ -311,13 +318,6 @@ contract CapitalFi is ERC20 {
         return tokenAmounts;
     }
 
-    /**
-     * @notice function to set whitelisted addresses
-     */
-    function setWhitelist(address _whitelist) external onlyOwner {
-        isWhitelisted[_whitelist] = true;
-    }
-
     // ----------------------------------- //
     //      GETTER FUNCTIONS               //
     // ----------------------------------  //
@@ -328,7 +328,7 @@ contract CapitalFi is ERC20 {
     }
 
     ///@notice function to get owner address
-    function getOwnerAddr() public view returns (address) {
+    function getOwnerAddr() external view returns (address) {
         return owner;
     }
 
@@ -344,7 +344,7 @@ contract CapitalFi is ERC20 {
 
     /**
      * @notice get the ERC20 token balance of the contract
-     * @param _token: address of the token
+     * @param _token address of the token
      */
     function getContractErc20Balance(
         address _token
