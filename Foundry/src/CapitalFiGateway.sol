@@ -8,24 +8,24 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 
 error CapitalFiGateway__FailedToWithdrawEth(address owner, uint256 amount);
 error CapitalFiGateway__FailedToWithdrawErc20(address owner, uint256 amount);
-error CapitalFiGateway__CAPITALFI_GATEWAY_ERROR();
-error CapitalFiGateway__ONLY_OWNER_CALL_THIS_FUNCTION();
+error CapitalFiGateway__CcipReceiveError();
+error CapitalFiGateway__OnlyOwnerCall();
 
 contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
     address public capitalFiAddr;
-    address public i_tokenAddr;
+    address public immutable i_tokenAddr;
     address public owner;
 
     modifier onlyOwner(address _address) {
-        if (_address != owner)
-            revert CapitalFiGateway__ONLY_OWNER_CALL_THIS_FUNCTION();
+        if (_address != owner) revert CapitalFiGateway__OnlyOwnerCall();
         _;
     }
 
     /**
-     *
      * @param _ccipRouter Address of the CCIP Router contract
      * @param _capitalFi address of the capitalFi contract
+     * @param _tokenAddr address of usdc Token
+     * @param _owner address of the owner
      */
     constructor(
         address _ccipRouter,
@@ -49,7 +49,7 @@ contract CapitalFiGateway is CCIPReceiver, ReentrancyGuard {
 
         // Call the CapitalFi function
         (bool success, ) = capitalFiAddr.call(message.data);
-        if (!success) revert CapitalFiGateway__CAPITALFI_GATEWAY_ERROR();
+        if (!success) revert CapitalFiGateway__CcipReceiveError();
     }
 
     /// @notice Fallback function to allow the contract to receive Ether.
