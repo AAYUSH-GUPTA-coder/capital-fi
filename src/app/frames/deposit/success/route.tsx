@@ -6,7 +6,7 @@ const handleRequest = frames(async (ctx) => {
   supplyAmountToDefiBase();
 
   return {
-    image: "https://i.imgur.com/D7a9GqA.png",
+    image: "https://imgur.com/mdk8MZ4.png",
     buttons: [
       <Button action='link' target={"https://capital-fi.vercel.app"}>
         Visit Capital Fi

@@ -9,7 +9,7 @@ const handleRequest = frames(async (ctx) => {
     "0x3039e4a4a540F35ae03A09f3D5A122c49566f919";
 
   return {
-    image: "https://i.imgur.com/D7a9GqA.png",
+    image: "https://imgur.com/isPOUQ2.png",
     buttons: [
       <Button
         action='tx'
