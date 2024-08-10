@@ -1,5 +1,15 @@
 OP Sepolia CapitalFi.sol address : 0xC189323749c5e98c6B9b1F0312282bD6eBD6B173
 OP Sepolia CapitalFiGateway.sol address : 0x34b2594C39C3427392CE980445f7F2A6dA21aF2a
+OP Sepolia CapitalFiGatewayTEST Address : 0xee9C95cF2CC16b18992d956756D6b7abf82EEB16
 
 BASE Sepolia CapitalFi.sol address : 0xC189323749c5e98c6B9b1F0312282bD6eBD6B173
 BASE Sepolia CapitalFiGateway.sol address : 0x34b2594C39C3427392CE980445f7F2A6dA21aF2a
+
+-----------------
+
+
+OP Sepolia CapitalFi.sol address NEW : 0x7e4CE6f92100a494D5c5C77cF55698B0dCD55580
+OP Sepolia CapitalFiGateway.sol NEW address : 0x9034Dd164780E43b28D2b048A9CA792b222E657a
+
+BASE Sepolia CapitalFi.sol address NEW: 0x48eCe3F01Eb811B174e04Ca88578A826c1204665
+BASE Sepolia CapitalFiGateway.sol address NEW  : 0xaf5eDa95b87fCf9767cED0d9c01b69e0A976C725
