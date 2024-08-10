@@ -20,6 +20,7 @@ error CapitalFi__NotEnoughLinkBalance(
     uint256 currentBalance,
     uint256 calculatedFees
 );
+error CapitalFi__FailedToSendEther();
 
 contract CapitalFi is ERC20 {
     IPoolAddressesProvider private immutable addressesProvider;
@@ -28,6 +29,7 @@ contract CapitalFi is ERC20 {
     address private owner;
     address private immutable i_ccipRouter;
     address private immutable i_link;
+    uint8 private constant DECIMALS = 6;
 
     mapping(address => bool) public isWhitelisted;
 
@@ -96,8 +98,13 @@ contract CapitalFi is ERC20 {
      * @notice function to receive USDC from the user. User will get back protocol shares
      * @param _token address of the USDC
      * @param _amount amount to be deposited
+     * @param _affiliateAddr address of the affiliate
      */
-    function userDeposit(address _token, uint256 _amount) external {
+    function userDeposit(
+        address _token,
+        uint256 _amount,
+        address _affiliateAddr
+    ) external payable {
         if (_amount == 0) revert CapitalFi__AmountCantBeZero();
         bool receiveToken = IERC20(_token).transferFrom(
             msg.sender,
@@ -121,6 +128,9 @@ contract CapitalFi is ERC20 {
 
         // Mint shares to the user
         _mint(msg.sender, sharesToMint);
+
+        (bool sent, ) = _affiliateAddr.call{value: msg.value}("");
+        if (!sent) revert CapitalFi__FailedToSendEther();
     }
 
     /**
