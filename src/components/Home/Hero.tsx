@@ -11,12 +11,12 @@ export default function Hero() {
   return (
     <div className="flex flex-col w-full gap-5 pt-20 pb-5">
       <div className="flex flex-col w-full items-center justify-center gap-8 pt-16 px-3">
-        <div className="flex gap-3 items-center w-fit py-1 px-3 bg-gradient-to-tr from-teal-200 to-sky-200 text-neutral-700 rounded-2xl">
+        <div className="flex gap-3 items-center w-fit py-1 px-3 bg-white text-neutral-700 border border-neutral-200/50 rounded-2xl">
           <span className="relative flex h-3 w-3 ml-1">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
           </span>
-          Earn yield daily live 💰
+          Powered by Superchain ⚡️
         </div>
         <h1 className="text-2xl sm:text-[3rem] lg:text-[4rem] font-bold leading-none text-center">
           Your DeFi <br /> Savings Account
