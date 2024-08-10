@@ -1,5 +1,9 @@
 # Capital Finance - The Best Superchain Yield Aggregator
 
+<p align="center">
+  <img src="public/capital.png" alt="Capital Finance Logo" width="200" />
+</p>
+
 ## Overview
 
 This project implements an advanced cross-chain yield aggregator for USDC, currently operational on Optimism and Base blockchains. It allows users to deposit USDC and earn optimized yield across different chains, leveraging the best available rates while ensuring top-notch security through Chainlink's Cross-Chain Interoperability Protocol (CCIP).
