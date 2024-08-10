@@ -13,10 +13,10 @@ export default function Hero() {
       <div className="flex flex-col w-full items-center justify-center gap-8 pt-16 px-3">
         <div className="flex gap-3 items-center w-fit py-1 px-3 bg-white text-neutral-700 border border-neutral-200/50 rounded-2xl">
           <span className="relative flex h-3 w-3 ml-1">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
           </span>
-          Powered by Superchain ⚡️
+          Powered by<b className="-mx-1.5">Superchain</b> ⚡️
         </div>
         <h1 className="text-2xl sm:text-[3rem] lg:text-[4rem] font-bold leading-none text-center">
           Your DeFi <br /> Savings Account
