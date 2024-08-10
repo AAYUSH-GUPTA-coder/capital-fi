@@ -27,6 +27,10 @@ The system consists of two main smart contracts:
 
 These contracts interact with AAVE lending pools on their respective chains and utilize Chainlink's CCIP for secure inter-chain communications and transfers.
 
+<p align="center">
+  <img src="diagrams/architecture.png" alt="Capital Finance Architecture" width="600" />
+</p>
+
 ## Optimized Yield Aggregation
 
 Our yield aggregator implements several strategies to maximize returns for users:
