@@ -1,3 +1,5 @@
+import { optimismSepolia } from "viem/chains";
+
 export const networks = [
   {
     name: "Optimism",
@@ -36,6 +38,11 @@ export const contractAddresses = {
 export const USDC = {
   baseSepolia: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
   opSepolia: "0x5fd84259d66Cd46123540766Be93DFE6D43130D7",
+};
+
+export const AaveUSDC = {
+  baseSepolia: "0xf53B60F4006cab2b3C4688ce41fD5362427A2A66",
+  optimismSepolia: "0xa818F1B57c201E092C4A2017A91815034326Efd1",
 };
 
 export const USDCABI = [
