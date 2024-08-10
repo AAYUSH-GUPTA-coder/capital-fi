@@ -4,7 +4,7 @@ import { contractAddresses, USDC } from "@/lib/constants";
 import { createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, optimismSepolia } from "viem/chains";
-import { contractABI } from "../../../ABI/CapitalFi";
+import { contractABI } from "@/lib/CapitalFi";
 import { getAPY } from "@/helpers";
 
 export const supplyAmountToDefiBase = async () => {

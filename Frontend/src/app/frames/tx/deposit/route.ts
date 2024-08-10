@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Abi, encodeFunctionData, parseUnits } from "viem";
 import { baseSepolia } from "viem/chains";
 import { contractAddresses, USDC } from "@/lib/constants";
-import { contractABI } from "../../../../../ABI/CapitalFi";
+import { contractABI } from "@/lib/CapitalFi";
 
 export async function POST(
   req: NextRequest
