@@ -335,14 +335,17 @@ contract CapitalFi is ERC20 {
         return tokenAmounts;
     }
 
-    /**
-     * @notice function to withdraw Link from the smart contract
-     */
+    /// @notice function to withdraw Link from the smart contract
     function WithdrawLink() external onlyOwner {
         LinkTokenInterface(i_link).transfer(
             msg.sender,
             LinkTokenInterface(i_link).balanceOf(address(this))
         );
+    }
+
+    /// @notice function to set decimal of our protocol tokens / shares
+    function decimals() public pure override returns (uint8) {
+        return DECIMALS;
     }
 
     // ----------------------------------- //
@@ -399,8 +402,3 @@ contract CapitalFi is ERC20 {
         return IERC20(_token).balanceOf(_user);
     }
 }
-
-// Ideally TotalPoolValue / totalProtocolValue = will be Amount in defi protocols in usd terms + value of pool in usd term. the problem is we have Pool in different chains, so also need to track that
-
-// ! check totalProtocolValue again, after completing smart contract
-// ! TotalProtocolValue = usd deposited in aave + usdc in contract on OP + usdc in contract on Base
