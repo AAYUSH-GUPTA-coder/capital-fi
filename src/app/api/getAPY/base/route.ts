@@ -1,7 +1,6 @@
 import { getAPY } from "@/helpers";
 
 export const GET = async (req: Request) => {
-  console.log("GET /getAPY/base");
   const getReservesResponse = await fetch(
     `https://gateway.thegraph.com/api/${process.env.GRAPH_API_KEY}/subgraphs/id/GQFbb95cE6d8mV989mL5figjaGaKCQB3xqYrr1bRyXqF`,
     {
@@ -14,7 +13,6 @@ export const GET = async (req: Request) => {
   );
 
   const { data } = await getReservesResponse.json();
-  console.log(data);
 
   const usdc = data.reserves.find(
     (reserve: any) =>

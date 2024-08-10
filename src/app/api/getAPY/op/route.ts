@@ -14,12 +14,11 @@ export const GET = async (req: Request) => {
 
   const { data } = await getReservesResponse.json();
 
-  console.log(data);
-
-  const usdc = data?.reserves.find(
-    (reserve: any) =>
-      reserve.underlyingAsset === "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
-  );
+  const usdc = data.reserves.find((reserve: any) => {
+    return (
+      reserve.underlyingAsset === "0x0b2c639c533813f4aa9d7837caf62653d097ff85"
+    );
+  });
 
   if (!usdc) {
     return new Response("USDC not found", {
