@@ -202,7 +202,8 @@ contract CapitalFi is ERC20 {
     /**
      * @notice function to bride the tokens to different chain and call the SupplyToDefi function on that chain.
      * @dev This function will work when our Protocol have token
-     * @param _token address of usdc
+     * @param _token address of usdc on the source chain
+     * @param _destinationToken address of usdc on the destination chain
      * @param _receiver address of the receiver contract address (CapitalFiGateway)
      * @param _gasFeeAmount gas required to execute this function
      * @param _destinationChainSelector ccip-chain ID of destination chain
@@ -210,10 +211,11 @@ contract CapitalFi is ERC20 {
      */
     function bridgeAndSupplyToDefi(
         address _token,
+        address _destinationToken,
         address _receiver,
         uint256 _gasFeeAmount,
         uint64 _destinationChainSelector
-    ) public onlyWhiteListed(msg.sender) returns (bytes32 messageId) {
+    ) public returns (bytes32 messageId) {
         // get the balance of USDC in this protocol
         uint256 totalBalance = getContractErc20Balance(_token);
 
@@ -226,7 +228,10 @@ contract CapitalFi is ERC20 {
         // create client message
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
             receiver: abi.encode(_receiver),
-            data: abi.encodeWithSignature("supplyToDefi(address)", _token),
+            data: abi.encodeWithSignature(
+                "supplyToDefi(address)",
+                _destinationToken
+            ),
             tokenAmounts: tokenAmounts,
             extraArgs: Client._argsToBytes(
                 Client.EVMExtraArgsV1({gasLimit: _gasFeeAmount})
@@ -276,7 +281,8 @@ contract CapitalFi is ERC20 {
     /**
      * @notice function to withdraw the tokens from AAVE protocol, bride the tokens to different chain and call the SupplyToDefi function on that chain.
      * @dev This function will work when our selected defi Protocol have tokens
-     * @param _token address of usdc
+     * @param _token address of usdc on source chain
+     * @param _destinationToken address of usdc on the destination chain
      * @param _receiver address of the receiver contract address (CapitalFiGateway on destination chains)
      * @param _gasFeeAmount gas required to execute this function
      * @param _destinationChainSelector ccip-chain ID of destination chain
@@ -284,6 +290,7 @@ contract CapitalFi is ERC20 {
      */
     function withdrawBridgeAndSupply(
         address _token,
+        address _destinationToken,
         address _receiver,
         uint256 _gasFeeAmount,
         uint64 _destinationChainSelector,
@@ -292,6 +299,7 @@ contract CapitalFi is ERC20 {
         withdrawFromDefi(_token, _aToken);
         bridgeAndSupplyToDefi(
             _token,
+            _destinationToken,
             _receiver,
             _gasFeeAmount,
             _destinationChainSelector
@@ -315,6 +323,16 @@ contract CapitalFi is ERC20 {
             amount: _amount
         });
         return tokenAmounts;
+    }
+
+    /**
+     * @notice function to withdraw Link from the smart contract
+     */
+    function WithdrawLink() external onlyOwner {
+        LinkTokenInterface(i_link).transfer(
+            msg.sender,
+            LinkTokenInterface(i_link).balanceOf(address(this))
+        );
     }
 
     // ----------------------------------- //
@@ -357,6 +375,18 @@ contract CapitalFi is ERC20 {
      */
     function getUserShares(address _user) public view returns (uint256) {
         return balanceOf(_user);
+    }
+
+    /**
+     * @notice function to get the ERC20 token balance of the user
+     * @param _user address of the user
+     * @param _token address of the token
+     */
+    function getUserErc20Balance(
+        address _user,
+        address _token
+    ) public view returns (uint256) {
+        return IERC20(_token).balanceOf(_user);
     }
 }
 
