@@ -24,6 +24,46 @@ const dummyData = [
     tx: "https://blockscout.com/tx/",
     amount: 1000,
   },
+  {
+    network: "Base",
+    tx: "https://blockscout.com/tx/",
+    amount: 100,
+  },
+  {
+    network: "Optimism",
+    tx: "https://blockscout.com/tx/",
+    amount: 200,
+  },
+  {
+    network: "Base",
+    tx: "https://blockscout.com/tx/",
+    amount: 500,
+  },
+  {
+    network: "Optimism",
+    tx: "https://blockscout.com/tx/",
+    amount: 1000,
+  },
+  {
+    network: "Base",
+    tx: "https://blockscout.com/tx/",
+    amount: 100,
+  },
+  {
+    network: "Optimism",
+    tx: "https://blockscout.com/tx/",
+    amount: 200,
+  },
+  {
+    network: "Base",
+    tx: "https://blockscout.com/tx/",
+    amount: 500,
+  },
+  {
+    network: "Optimism",
+    tx: "https://blockscout.com/tx/",
+    amount: 1000,
+  },
 ];
 
 export default function ActivityContainer() {
@@ -32,7 +72,7 @@ export default function ActivityContainer() {
       <span className="flex p-3 text-neutral-700 font-medium border-b border-neutral-100">
         Activity
       </span>
-      <div className="flex flex-col gap-2 p-5 items-center justify-center scroll-smooth scrollbar">
+      <div className="p-5 items-center justify-center scroll-smooth scrollbar">
         {dummyData.length > 0 ? (
           dummyData.map((data, index) => {
             const icon = networks.filter(
@@ -43,7 +83,7 @@ export default function ActivityContainer() {
                 href={data.tx}
                 target="_blank"
                 key={index}
-                className="flex w-full items-center justify-between px-3 py-2 border border-neutral-200 hover:shadow-md"
+                className="flex w-full items-center justify-between px-3 py-2 mb-2 border border-neutral-200 hover:bg-neutral-50 hover:shadow-md rounded"
               >
                 <span className="text-neutral-600">
                   {index + 1}. Deposited{" "}
