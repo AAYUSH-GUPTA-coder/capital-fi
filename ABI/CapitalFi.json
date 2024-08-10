@@ -15,6 +15,13 @@
   },
   {
     "type": "function",
+    "name": "WithdrawLink",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "allowance",
     "inputs": [
       { "name": "owner", "type": "address", "internalType": "address" },
@@ -47,6 +54,11 @@
     "name": "bridgeAndSupplyToDefi",
     "inputs": [
       { "name": "_token", "type": "address", "internalType": "address" },
+      {
+        "name": "_destinationToken",
+        "type": "address",
+        "internalType": "address"
+      },
       { "name": "_receiver", "type": "address", "internalType": "address" },
       {
         "name": "_gasFeeAmount",
@@ -125,6 +137,16 @@
     "type": "function",
     "name": "getTotalPool",
     "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getUserErc20Balance",
+    "inputs": [
+      { "name": "_user", "type": "address", "internalType": "address" },
+      { "name": "_token", "type": "address", "internalType": "address" }
+    ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
   },
@@ -255,6 +277,11 @@
     "name": "withdrawBridgeAndSupply",
     "inputs": [
       { "name": "_token", "type": "address", "internalType": "address" },
+      {
+        "name": "_destinationToken",
+        "type": "address",
+        "internalType": "address"
+      },
       { "name": "_receiver", "type": "address", "internalType": "address" },
       {
         "name": "_gasFeeAmount",
