@@ -1,5 +1,6 @@
 import Moralis from "moralis";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import { contractAddresses } from "@/lib/constants";
 
 export const POST = async (req: Request) => {
   const { address } = await req.json();
@@ -14,8 +15,7 @@ export const POST = async (req: Request) => {
     apiKey: process.env.MORALIS_API_KEY,
   });
 
-  const contractAddressBaseSepolia =
-    "0x48eCe3F01Eb811B174e04Ca88578A826c1204665";
+  const contractAddressBaseSepolia = contractAddresses.baseSepolia;
 
   const chain = EvmChain.BASE_SEPOLIA;
 
