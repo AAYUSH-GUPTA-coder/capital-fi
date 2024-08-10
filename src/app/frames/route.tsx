@@ -14,10 +14,15 @@ const handleRequest = frames(async (ctx) => {
       <Button
         action='post'
         target={`${process.env.BASE_URL}/frames/deposit?referrer=${referrer}`}
+        key={"deposit"}
       >
         Deposit
       </Button>,
-      <Button action='post' target={`${process.env.BASE_URL}/frames/withdraw`}>
+      <Button
+        action='post'
+        target={`${process.env.BASE_URL}/frames/withdraw`}
+        key={"withdraw"}
+      >
         Withdraw
       </Button>,
     ],

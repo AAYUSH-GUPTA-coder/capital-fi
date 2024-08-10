@@ -15,6 +15,7 @@ const handleRequest = frames(async (ctx) => {
         action='tx'
         target={`${process.env.BASE_URL}/frames/tx/approval`}
         post_url={`${process.env.BASE_URL}/frames/deposit`}
+        key={"approval"}
       >
         Approval
       </Button>,
@@ -22,6 +23,7 @@ const handleRequest = frames(async (ctx) => {
         action='tx'
         target={`${process.env.BASE_URL}/frames/tx/deposit?referrer=${referrer}`}
         post_url={`${process.env.BASE_URL}/frames/deposit/success`}
+        key={"deposit"}
       >
         Deposit
       </Button>,

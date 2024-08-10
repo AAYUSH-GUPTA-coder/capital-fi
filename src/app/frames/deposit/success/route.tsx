@@ -8,7 +8,7 @@ const handleRequest = frames(async (ctx) => {
   return {
     image: "https://imgur.com/mdk8MZ4.png",
     buttons: [
-      <Button action='link' target={"https://capital-fi.vercel.app"}>
+      <Button action='link' target={"https://capital-fi.vercel.app"} key={'link'}>
         Visit Capital Fi
       </Button>,
     ],
