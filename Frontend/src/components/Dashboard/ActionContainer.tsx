@@ -114,12 +114,16 @@ export default function ActionContainer() {
     if (isTxnCompleted && txnState === "deposit") {
       chain?.id === base.id ? supplyAmountToDefiBase() : supplyAmountToDefiOp();
       setTxnState("idle");
-      toast.success(toastWithCTA(approveHash as string, "deposited"));
+      toast.success(toastWithCTA(approveHash as string, "deposited"),{
+        duration: 10000
+      });
     }
 
     if (isTxnCompleted && txnState === "withdraw") {
       setTxnState("idle");
-      toast.success(toastWithCTA(approveHash as string, "withdrawn"));
+      toast.success(toastWithCTA(approveHash as string, "withdrawn"),{
+        duration: 10000
+      });
     }
   }, [isTxnCompleted]);
 
