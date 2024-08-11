@@ -21,6 +21,7 @@ error CapitalFi__NotEnoughLinkBalance(
     uint256 calculatedFees
 );
 error CapitalFi__FailedToSendEther();
+error CapitalFi__LiquidityIssue();
 
 contract CapitalFi is ERC20 {
     IPoolAddressesProvider private immutable addressesProvider;
@@ -177,6 +178,8 @@ contract CapitalFi is ERC20 {
         ) {
             pool.withdraw(_token, amountToWithdraw, address(this));
             IERC20(_token).transfer(msg.sender, amountToWithdraw);
+        } else {
+            revert CapitalFi__LiquidityIssue();
         }
 
         return amountToWithdraw;
