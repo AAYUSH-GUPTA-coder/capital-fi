@@ -8,6 +8,26 @@
 
 This project implements an advanced cross-chain yield aggregator for USDC, currently operational on Optimism and Base blockchains. It allows users to deposit USDC and earn optimized yield across different chains, leveraging the best available rates while ensuring top-notch security through Chainlink's Cross-Chain Interoperability Protocol (CCIP).
 
+## Contract Addresses
+
+- CapitalFi (Optimism):
+
+[https://optimism.blockscout.com/address/0xaf5eDa95b87fCf9767cED0d9c01b69e0A976C725?tab=contract](https://optimism.blockscout.com/address/0xaf5eDa95b87fCf9767cED0d9c01b69e0A976C725?tab=contract)
+
+[CCIP Explorer](https://ccip.chain.link/address/0xaf5eDa95b87fCf9767cED0d9c01b69e0A976C725)
+
+- CapitalFiGateway (Optimism): [https://optimism.blockscout.com/address/0x0A9723b00f835145751b9183775aF2a52e406Ebe?tab=contract](https://optimism.blockscout.com/address/0x0A9723b00f835145751b9183775aF2a52e406Ebe?tab=contract)
+
+[CCIP Explorer](https://ccip.chain.link/address/0x0A9723b00f835145751b9183775aF2a52e406Ebe)
+
+- CapitalFi (Base): [https://base.blockscout.com/address/0x170537A78FA4ca63AB849D208bEE8fD3Ab1fAc97?tab=contract](https://base.blockscout.com/address/0x170537A78FA4ca63AB849D208bEE8fD3Ab1fAc97?tab=contract)
+
+[CCIP Explorer](https://ccip.chain.link/address/0x170537A78FA4ca63AB849D208bEE8fD3Ab1fAc97)
+
+- CapitalFiGateway (Base): [https://base.blockscout.com/address/0x482b052dD873744c3e3722abE50735b0aA849556?tab=contract](https://base.blockscout.com/address/0x482b052dD873744c3e3722abE50735b0aA849556?tab=contract)
+
+[CCIP Explorer](https://ccip.chain.link/address/0x482b052dD873744c3e3722abE50735b0aA849556)
+
 ## Features
 
 - Deposit USDC on Optimism or Base
