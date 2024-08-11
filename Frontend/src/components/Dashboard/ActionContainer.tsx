@@ -22,6 +22,8 @@ import { supplyAmountToDefiBase, supplyAmountToDefiOp } from "@/app/_actions";
 import { base, optimism } from "viem/chains";
 import { getTotalValue } from "@/lib/utils";
 import { chains, getUSDCBalance } from "@/helpers";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function ActionContainer() {
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0]);
@@ -41,8 +43,7 @@ export default function ActionContainer() {
       : contractAddresses.op) as `0x${string}`;
 
   const { data: approveHash, writeContractAsync } = useWriteContract();
-
-  const { isSuccess: isTxnCompleted } = useWaitForTransactionReceipt({
+  const { isSuccess: isTxnCompleted, data } = useWaitForTransactionReceipt({
     hash: approveHash,
   });
 
@@ -88,6 +89,23 @@ export default function ActionContainer() {
     });
   };
 
+  const toastWithCTA = (tx: string, type: string) => {
+    return (
+      <div>
+        <Link
+          href={
+            chain?.id === base.id
+              ? `https://base.blockscout.com/tx/${tx}`
+              : `https://optimism.blockscout.com/tx/${tx}`
+          }
+          target="_blank"
+        >
+          USDC {type} successfully. Check txn!
+        </Link>
+      </div>
+    );
+  };
+
   useEffect(() => {
     if (isTxnCompleted && txnState === "approve") {
       handleDeposit();
@@ -96,6 +114,12 @@ export default function ActionContainer() {
     if (isTxnCompleted && txnState === "deposit") {
       chain?.id === base.id ? supplyAmountToDefiBase() : supplyAmountToDefiOp();
       setTxnState("idle");
+      toast.success(toastWithCTA(approveHash as string, "deposited"));
+    }
+
+    if (isTxnCompleted && txnState === "withdraw") {
+      setTxnState("idle");
+      toast.success(toastWithCTA(approveHash as string, "withdrawn"));
     }
   }, [isTxnCompleted]);
 
@@ -114,24 +138,24 @@ export default function ActionContainer() {
   }, [address, chain]);
 
   return (
-    <div className='flex flex-col w-full md:w-[40%] bg-white shadow-md'>
+    <div className="flex flex-col w-full md:w-[40%] bg-white shadow-md">
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className='flex flex-col gap-6 p-4 mt-5'>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-center justify-between'>
-            <h3 className='text-neutral-600 font-medium'>
+      <div className="flex flex-col gap-6 p-4 mt-5">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-neutral-600 font-medium">
               {activeTab === 0 ? "You're depositing" : "You're withdrawing"}
             </h3>
-            <span className='flex w-fit py-1 px-4 text-[0.8rem] bg-gradient-to-tr from-emerald-100/60 to-amber-100/60 text-neutral-500 rounded-2xl'>
-              ⚡️ &nbsp;Testnet mode
+            <span className="flex w-fit py-1 px-4 text-[0.8rem] bg-gradient-to-tr from-emerald-100/60 to-amber-100/60 text-neutral-600 rounded-2xl">
+              ⚡️ &nbsp;Live on mainnet
             </span>
           </div>
-          <div className='flex items-center border border-neutral-200'>
-            <span className='flex w-[80%] items-center justify-between px-5 text-neutral-400 border-r border-neutral-200'>
+          <div className="flex items-center border border-neutral-200">
+            <span className="flex w-[80%] items-center justify-between px-5 text-neutral-400 border-r border-neutral-200">
               <input
-                type='number'
-                placeholder='0.00'
-                className='w-full py-2 outline-none text-neutral-800'
+                type="number"
+                placeholder="0.00"
+                className="w-full py-2 outline-none text-neutral-800"
                 value={amount}
                 onChange={(event) => {
                   setAmount(Number(event.target.value));
@@ -139,7 +163,7 @@ export default function ActionContainer() {
               />
               USDC
             </span>
-            <div className='w-[20%]'>
+            <div className="w-[20%]">
               <Dropdown
                 networks={networks}
                 selectedNetwork={selectedNetwork}
@@ -153,15 +177,15 @@ export default function ActionContainer() {
               />
             </div>
           </div>
-          <span className='text-sm text-neutral-400 text-end'>
+          <span className="text-sm text-neutral-400 text-end">
             Balance: {usdcBalance} USDC
           </span>
         </div>
-        <div className='flex items-center gap-2'>
+        <div className="flex items-center gap-2">
           {amountVariance.map((preset, index) => (
             <button
               key={index}
-              className='w-full py-1.5 bg-neutral-100 text-neutral-600 rounded'
+              className="w-full py-1.5 bg-neutral-100 text-neutral-600 rounded"
               onClick={() =>
                 setAmount(
                   preset.name === "MAX"
@@ -177,7 +201,7 @@ export default function ActionContainer() {
           ))}
         </div>
         <button
-          className='w-full py-2.5 items-center justify-center bg-indigo-500 text-white disabled:bg-neutral-200 disabled:text-neutral-600'
+          className="w-full py-2.5 items-center justify-center bg-indigo-500 text-white disabled:bg-neutral-200 disabled:text-neutral-600"
           onClick={async () => {
             const userShares = await getTotalValue(address!, chain!);
             if (activeTab === 0) {

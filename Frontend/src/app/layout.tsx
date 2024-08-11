@@ -4,6 +4,7 @@ import "./globals.css";
 import Web3ModalProvider from "./providers";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
         <Web3ModalProvider>
           <Navbar />
           {children}
+          <Toaster />
           <Footer />
         </Web3ModalProvider>
       </body>
