@@ -27,7 +27,7 @@ export default function Hero() {
         </p>
         <span className="flex gap-4 items-center">
           <Link
-            href={""}
+            href={"https://warpcast.com/neelpatel/0xfa92c0f8"}
             target="_blank"
             className="w-fit px-6 py-1.5 bg-black text-white border border-neutral-600 rounded-xl"
           >
