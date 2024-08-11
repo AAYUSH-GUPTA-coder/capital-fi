@@ -1,7 +1,7 @@
 # Capital Finance - The Best Superchain Yield Aggregator
 
 <p align="center">
-  <img src="public/capital.png" alt="Capital Finance Logo" width="200" />
+  <img src="Frontend/public/capital.png" alt="Capital Finance Logo" width="200" />
 </p>
 
 ## Overview
