@@ -1,9 +1,11 @@
 import { getAPYonBase, getAPYonOP } from "@/app/_actions";
 import { contractABI } from "@/lib/CapitalFi";
 import { contractAddresses } from "@/lib/constants";
+import { getTotalValue } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { base, Chain } from "viem/chains";
-import { useAccount, useReadContract } from "wagmi";
+import { parseUnits } from "viem";
+import { base } from "viem/chains";
+import { useAccount } from "wagmi";
 
 export default function Header() {
   const { address } = useAccount();
@@ -11,30 +13,25 @@ export default function Header() {
   const { chain } = useAccount();
   const [APY, setAPY] = useState<string>("0");
 
-  const contractAddress = (chain: Chain) =>
-    (chain === base
-      ? contractAddresses.base
-      : contractAddresses.op) as `0x${string}`;
-
-  const userShares = useReadContract({
-    abi: contractABI,
-    address: contractAddress(chain!),
-    functionName: "getUserShares",
-    args: [address],
-  }).data;
-
   useEffect(() => {
     const fetchValues = async () => {
       const apy =
-        chain?.id === base.id
-          ? await getAPYonBase()
-          : await getAPYonOP();
+        chain?.id === base.id ? await getAPYonBase() : await getAPYonOP();
       setAPY(apy as string);
-      console.log("userShares", apy);
-      setTotalValue(userShares?.toString() ?? "0");
     };
     fetchValues();
   }, []);
+
+  useEffect(() => {
+    const fetchTotalValue = async () => {
+      if (address) {
+        const value = (await getTotalValue(address, chain!)) as number;
+        console.log("value", value);
+        setTotalValue(value.toFixed(2));
+      }
+    };
+    fetchTotalValue();
+  }, [address, chain]);
 
   return (
     <div className='flex flex-col md:flex-row gap-5 items-start md:items-center justify-start md:justify-between'>

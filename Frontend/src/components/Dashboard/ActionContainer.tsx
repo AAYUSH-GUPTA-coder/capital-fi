@@ -12,7 +12,6 @@ import { Network } from "@/lib/types";
 import Tabs from "../ui/Tabs";
 import {
   useAccount,
-  useReadContract,
   useSwitchChain,
   useWaitForTransactionReceipt,
   useWriteContract,
@@ -21,11 +20,15 @@ import { contractABI } from "@/lib/CapitalFi";
 import { Chain, parseUnits } from "viem";
 import { supplyAmountToDefiBase, supplyAmountToDefiOp } from "@/app/_actions";
 import { base, optimism } from "viem/chains";
+import { getTotalValue } from "@/lib/utils";
+import { chains, getUSDCBalance } from "@/helpers";
 
 export default function ActionContainer() {
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0]);
   const [amount, setAmount] = useState<number>();
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [usdcBalance, setUsdcBalance] = useState<string>("0");
+  const [userShares, setUserShares] = useState<number>(0);
   const { chain, address } = useAccount();
   const { switchChain } = useSwitchChain();
   const [txnState, setTxnState] = useState<
@@ -42,13 +45,6 @@ export default function ActionContainer() {
   const { isSuccess: isTxnCompleted } = useWaitForTransactionReceipt({
     hash: approveHash,
   });
-
-  const userShares = useReadContract({
-    abi: contractABI,
-    address: contractAddress(chain!),
-    functionName: "getUserShares",
-    args: [address],
-  }).data;
 
   const handleApproval = async () => {
     setTxnState("approve");
@@ -86,10 +82,8 @@ export default function ActionContainer() {
       functionName: "userWithdraw",
       args: [
         chain?.id === base.id ? USDC.base : USDC.op,
-        chain?.id === base.id
-          ? AaveUSDC.base
-          : AaveUSDC.op,
-        userShares,
+        chain?.id === base.id ? AaveUSDC.base : AaveUSDC.op,
+        parseUnits(userShares.toString(), 6),
       ],
     });
   };
@@ -100,12 +94,24 @@ export default function ActionContainer() {
     }
 
     if (isTxnCompleted && txnState === "deposit") {
-      chain?.id === base.id
-        ? supplyAmountToDefiBase()
-        : supplyAmountToDefiOp();
+      chain?.id === base.id ? supplyAmountToDefiBase() : supplyAmountToDefiOp();
       setTxnState("idle");
     }
   }, [isTxnCompleted]);
+
+  useEffect(() => {
+    if (address && chain) {
+      getUSDCBalance(
+        address,
+        chain.id === base.id ? chains.base : chains.optimism
+      ).then((balance: number | undefined) => {
+        setUsdcBalance(balance?.toFixed(2) ?? "0");
+      });
+      getTotalValue(address, chain).then((shares: number) => {
+        setUserShares(shares);
+      });
+    }
+  }, [address, chain]);
 
   return (
     <div className='flex flex-col w-full md:w-[40%] bg-white shadow-md'>
@@ -140,9 +146,7 @@ export default function ActionContainer() {
                 onSelect={(network) => {
                   switchChain({
                     chainId:
-                      network.name === "Optimism"
-                        ? optimism.id
-                        : base.id,
+                      network.name === "Optimism" ? optimism.id : base.id,
                   });
                   setSelectedNetwork(network);
                 }}
@@ -150,7 +154,7 @@ export default function ActionContainer() {
             </div>
           </div>
           <span className='text-sm text-neutral-400 text-end'>
-            Balance: 0.00 USDC
+            Balance: {usdcBalance} USDC
           </span>
         </div>
         <div className='flex items-center gap-2'>
@@ -158,7 +162,15 @@ export default function ActionContainer() {
             <button
               key={index}
               className='w-full py-1.5 bg-neutral-100 text-neutral-600 rounded'
-              onClick={() => setAmount(preset.value)}
+              onClick={() =>
+                setAmount(
+                  preset.name === "MAX"
+                    ? activeTab === 0
+                      ? Number(usdcBalance)
+                      : Number(userShares)
+                    : preset.value
+                )
+              }
             >
               {preset.name}
             </button>
@@ -167,6 +179,7 @@ export default function ActionContainer() {
         <button
           className='w-full py-2.5 items-center justify-center bg-indigo-500 text-white disabled:bg-neutral-200 disabled:text-neutral-600'
           onClick={async () => {
+            const userShares = await getTotalValue(address!, chain!);
             if (activeTab === 0) {
               await handleApproval();
             } else if (activeTab === 1 && userShares) {

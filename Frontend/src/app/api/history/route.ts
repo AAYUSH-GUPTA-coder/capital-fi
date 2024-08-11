@@ -1,11 +1,12 @@
 import Moralis from "moralis";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { contractAddresses } from "@/lib/constants";
+import { base } from "viem/chains";
 
 let isMoralisInitialized = false;
 
 export const POST = async (req: Request) => {
-  const { address } = await req.json();
+  const { address, chainId } = await req.json();
 
   if (!address) {
     return new Response("Address is required", {
@@ -21,7 +22,7 @@ export const POST = async (req: Request) => {
   }
 
   const contractAddressBase = contractAddresses.base;
-  const chain = EvmChain.BASE;
+  const chain = chainId === base.id ? EvmChain.BASE : EvmChain.OPTIMISM;
 
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
     address: contractAddressBase,

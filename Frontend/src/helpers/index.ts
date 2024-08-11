@@ -25,7 +25,8 @@ export const getUSDCBalance = async (address: `0x${string}`, chain: chains) => {
         `https://base.blockscout.com/api?module=account&action=tokenbalance&contractaddress=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&address=${address}`
       );
       const data = await response.json();
-      return data.result;
+      console.log("data", data);
+      return (data.result / 1e6)  as number;
     } catch (error) {
       console.error(error);
     }
@@ -35,7 +36,7 @@ export const getUSDCBalance = async (address: `0x${string}`, chain: chains) => {
         `https://optimism.blockscout.com/api?module=account&action=tokenbalance&contractaddress=0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85&address=${address}`
       );
       const data = await response.json();
-      return data.result;
+      return (data.result / 1e6) as number;
     } catch (error) {
       console.error(error);
     }

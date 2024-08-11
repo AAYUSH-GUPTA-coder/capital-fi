@@ -22,8 +22,6 @@ export const supplyAmountToDefiBase = async () => {
     functionName: "supplyToDefi",
     args: [USDC.base],
   });
-
-  console.log("tx", tx);
 };
 
 export const supplyAmountToDefiOp = async () => {
@@ -42,7 +40,6 @@ export const supplyAmountToDefiOp = async () => {
     args: [USDC.op],
   });
 
-  console.log("tx", tx);
 };
 
 export const getAPYonBase = async () => {

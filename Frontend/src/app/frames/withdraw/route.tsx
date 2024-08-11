@@ -6,6 +6,13 @@ const handleRequest = frames(async (ctx) => {
     image: "https://i.imgur.com/xo0nhjq.png",
     buttons: [
       <Button
+        action='link'
+        target={`https://base.blockscout.com/tx/${ctx.message?.transactionId}`}
+        key={"link"}
+      >
+        Check Txn
+      </Button>,
+      <Button
         action='post'
         target={`${process.env.BASE_URL}/frames/deposit`}
         key={"deposit"}

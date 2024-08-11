@@ -77,7 +77,7 @@ const dummyData = [
 ];
 
 export default function ActivityContainer() {
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
 
   const {
     data: activities,
@@ -90,7 +90,7 @@ export default function ActivityContainer() {
 
       const response = await fetch("/api/history", {
         method: "POST",
-        body: JSON.stringify({ address }),
+        body: JSON.stringify({ address, chainId }),
       });
       if (!response.ok) {
         throw new Error("Failed to fetch activity data");
@@ -121,7 +121,7 @@ export default function ActivityContainer() {
           )[0].icon;
           return (
             <Link
-              href={`https://basescan.org/tx/${data.txHash}`}
+              href={`https://base.blockscout.com/tx/${data.txHash}`}
               target='_blank'
               key={index}
               className='flex w-full items-center justify-between px-3 py-2 mb-2 border border-neutral-200 hover:bg-neutral-50 hover:shadow-md rounded'
