@@ -1,5 +1,3 @@
-import { optimismSepolia } from "viem/chains";
-
 export const networks = [
   {
     name: "Optimism",
@@ -31,18 +29,18 @@ export const amountVariance = [
 ];
 
 export const contractAddresses = {
-  baseSepolia: "0x48eCe3F01Eb811B174e04Ca88578A826c1204665",
-  opSepolia: "0x7e4CE6f92100a494D5c5C77cF55698B0dCD55580",
+  base: "0x170537A78FA4ca63AB849D208bEE8fD3Ab1fAc97",
+  op: "0xaf5eDa95b87fCf9767cED0d9c01b69e0A976C725",
 };
 
 export const USDC = {
-  baseSepolia: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-  opSepolia: "0x5fd84259d66Cd46123540766Be93DFE6D43130D7",
+  base: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  op: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
 };
 
 export const AaveUSDC = {
-  baseSepolia: "0xf53B60F4006cab2b3C4688ce41fD5362427A2A66",
-  optimismSepolia: "0xa818F1B57c201E092C4A2017A91815034326Efd1",
+  base: "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB",
+  op: "0x625E7708f30cA75bfd92586e17077590C60eb4cD",
 };
 
 export const USDCABI = [

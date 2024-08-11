@@ -1,7 +1,9 @@
 import { getAPYonBase, getAPYonOP } from "@/app/_actions";
+import { contractABI } from "@/lib/CapitalFi";
+import { contractAddresses } from "@/lib/constants";
 import { useEffect, useState } from "react";
-import { baseSepolia } from "viem/chains";
-import { useAccount } from "wagmi";
+import { base, Chain } from "viem/chains";
+import { useAccount, useReadContract } from "wagmi";
 
 export default function Header() {
   const { address } = useAccount();
@@ -9,13 +11,27 @@ export default function Header() {
   const { chain } = useAccount();
   const [APY, setAPY] = useState<string>("0");
 
+  const contractAddress = (chain: Chain) =>
+    (chain === base
+      ? contractAddresses.base
+      : contractAddresses.op) as `0x${string}`;
+
+  const userShares = useReadContract({
+    abi: contractABI,
+    address: contractAddress(chain!),
+    functionName: "getUserShares",
+    args: [address],
+  }).data;
+
   useEffect(() => {
     const fetchValues = async () => {
       const apy =
-        chain?.id === baseSepolia.id
+        chain?.id === base.id
           ? await getAPYonBase()
           : await getAPYonOP();
       setAPY(apy as string);
+      console.log("userShares", apy);
+      setTotalValue(userShares?.toString() ?? "0");
     };
     fetchValues();
   }, []);

@@ -3,7 +3,7 @@
 import { contractAddresses, USDC } from "@/lib/constants";
 import { createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { baseSepolia, optimismSepolia } from "viem/chains";
+import { base, optimism } from "viem/chains";
 import { contractABI } from "@/lib/CapitalFi";
 import { getAPY } from "@/helpers";
 
@@ -12,15 +12,15 @@ export const supplyAmountToDefiBase = async () => {
 
   const client = createWalletClient({
     account,
-    chain: baseSepolia,
+    chain: base,
     transport: http(),
   });
 
   const tx = await client.writeContract({
-    address: contractAddresses.baseSepolia as `0x${string}`,
+    address: contractAddresses.base as `0x${string}`,
     abi: contractABI,
     functionName: "supplyToDefi",
-    args: [USDC.baseSepolia],
+    args: [USDC.base],
   });
 
   console.log("tx", tx);
@@ -31,15 +31,15 @@ export const supplyAmountToDefiOp = async () => {
 
   const client = createWalletClient({
     account,
-    chain: optimismSepolia,
+    chain: optimism,
     transport: http(),
   });
 
   const tx = await client.writeContract({
-    address: contractAddresses.opSepolia as `0x${string}`,
+    address: contractAddresses.op as `0x${string}`,
     abi: contractABI,
     functionName: "supplyToDefi",
-    args: [USDC.opSepolia],
+    args: [USDC.op],
   });
 
   console.log("tx", tx);

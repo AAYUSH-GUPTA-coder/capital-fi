@@ -19,8 +19,9 @@ const handleRequest = frames(async (ctx) => {
         Deposit
       </Button>,
       <Button
-        action='post'
-        target={`${process.env.BASE_URL}/frames/withdraw`}
+        action='tx'
+        target={`${process.env.BASE_URL}/frames/withdraw/tx`}
+        post_url={`${process.env.BASE_URL}/frames/withdraw`}
         key={"withdraw"}
       >
         Withdraw

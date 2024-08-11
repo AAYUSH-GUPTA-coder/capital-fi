@@ -18,9 +18,9 @@ import {
   useWriteContract,
 } from "wagmi";
 import { contractABI } from "@/lib/CapitalFi";
-import { Chain, formatUnits, parseUnits } from "viem";
-import { baseSepolia, optimismSepolia } from "viem/chains";
+import { Chain, parseUnits } from "viem";
 import { supplyAmountToDefiBase, supplyAmountToDefiOp } from "@/app/_actions";
+import { base, optimism } from "viem/chains";
 
 export default function ActionContainer() {
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0]);
@@ -33,9 +33,9 @@ export default function ActionContainer() {
   >("idle");
 
   const contractAddress = (chain: Chain) =>
-    (chain === baseSepolia
-      ? contractAddresses.baseSepolia
-      : contractAddresses.opSepolia) as `0x${string}`;
+    (chain === base
+      ? contractAddresses.base
+      : contractAddresses.op) as `0x${string}`;
 
   const { data: approveHash, writeContractAsync } = useWriteContract();
 
@@ -54,9 +54,9 @@ export default function ActionContainer() {
     setTxnState("approve");
     await writeContractAsync({
       address:
-        chain?.id === baseSepolia.id
-          ? (USDC.baseSepolia as `0x${string}`)
-          : (USDC.opSepolia as `0x${string}`),
+        chain?.id === base.id
+          ? (USDC.base as `0x${string}`)
+          : (USDC.op as `0x${string}`),
       abi: USDCABI,
       functionName: "approve",
       args: [contractAddress(chain!), parseUnits(amount?.toString() ?? "0", 6)],
@@ -70,9 +70,11 @@ export default function ActionContainer() {
       abi: contractABI,
       functionName: "userDeposit",
       args: [
-        chain?.id === baseSepolia.id ? USDC.baseSepolia : USDC.opSepolia,
+        chain?.id === base.id ? USDC.base : USDC.op,
         parseUnits(amount?.toString() ?? "0", 6),
+        "0x3039e4a4a540F35ae03A09f3D5A122c49566f919",
       ],
+      value: parseUnits("0.0001", 18),
     });
   };
 
@@ -83,10 +85,10 @@ export default function ActionContainer() {
       abi: contractABI,
       functionName: "userWithdraw",
       args: [
-        chain?.id === baseSepolia.id ? USDC.baseSepolia : USDC.opSepolia,
-        chain?.id === baseSepolia.id
-          ? AaveUSDC.baseSepolia
-          : AaveUSDC.optimismSepolia,
+        chain?.id === base.id ? USDC.base : USDC.op,
+        chain?.id === base.id
+          ? AaveUSDC.base
+          : AaveUSDC.op,
         userShares,
       ],
     });
@@ -98,7 +100,7 @@ export default function ActionContainer() {
     }
 
     if (isTxnCompleted && txnState === "deposit") {
-      chain?.id === baseSepolia.id
+      chain?.id === base.id
         ? supplyAmountToDefiBase()
         : supplyAmountToDefiOp();
       setTxnState("idle");
@@ -139,8 +141,8 @@ export default function ActionContainer() {
                   switchChain({
                     chainId:
                       network.name === "Optimism"
-                        ? optimismSepolia.id
-                        : baseSepolia.id,
+                        ? optimism.id
+                        : base.id,
                   });
                   setSelectedNetwork(network);
                 }}

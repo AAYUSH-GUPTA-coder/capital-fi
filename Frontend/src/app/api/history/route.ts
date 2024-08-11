@@ -20,11 +20,11 @@ export const POST = async (req: Request) => {
     isMoralisInitialized = true;
   }
 
-  const contractAddressBaseSepolia = contractAddresses.baseSepolia;
-  const chain = EvmChain.BASE_SEPOLIA;
+  const contractAddressBase = contractAddresses.base;
+  const chain = EvmChain.BASE;
 
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
-    address: contractAddressBaseSepolia,
+    address: contractAddressBase,
     chain,
   });
 
@@ -33,7 +33,7 @@ export const POST = async (req: Request) => {
   const tokenTransfers = await Promise.all(
     transactions.map(async (tx: any) => {
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
-        address: contractAddressBaseSepolia,
+        address: contractAddressBase,
         chain,
       });
 
