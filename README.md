@@ -80,7 +80,7 @@ We leverage Chainlink's Cross-Chain Interoperability Protocol (CCIP) for managin
 
 ### CapitalFi Contract
 
-- `userDeposit(address _token, uint256 _amount, address _affiliateAddress, uint256 _affiliateAmount)`: Allows users to deposit USDC and optionally pay an affiliate.
+- `userDeposit(address _token, uint256 _amount, address _affiliateAddr)`: Allows users to deposit USDC and optionally pay an affiliate.
 - `userWithdraw(address _token, address _aToken, uint256 _shares)`: Enables users to withdraw their funds and earned yield.
 - `supplyToDefi(address _token)`: Supplies protocol USDC to the AAVE lending pool.
 - `withdrawFromDefi(address _token, address _aTokenAddr)`: Withdraws protocol USDC from the AAVE lending pool.
