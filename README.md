@@ -8,6 +8,16 @@
 
 This project implements an advanced cross-chain yield aggregator for USDC, currently operational on Optimism and Base blockchains. It allows users to deposit USDC and earn optimized yield across different chains, leveraging the best available rates while ensuring top-notch security through Chainlink's Cross-Chain Interoperability Protocol (CCIP).
 
+## Features
+
+- Deposit USDC on Optimism or Base
+- Earn optimized yield through AAVE lending protocols across multiple chains, we are working on integrating more protocols
+- Cross-chain transfers for dynamic yield optimization
+- Automated yield rebalancing for maximum returns
+- User-friendly interface for deposits, withdrawals, and yield tracking
+- High-security cross-chain operations using Chainlink's CCIP
+- Affiliate program for user acquisition
+
 ## Contract Addresses
 
 - CapitalFi (Optimism):
@@ -33,16 +43,6 @@ This project implements an advanced cross-chain yield aggregator for USDC, curre
 [https://base.blockscout.com/address/0x482b052dD873744c3e3722abE50735b0aA849556?tab=contract](https://base.blockscout.com/address/0x482b052dD873744c3e3722abE50735b0aA849556?tab=contract)
 
 [CCIP Explorer](https://ccip.chain.link/address/0x482b052dD873744c3e3722abE50735b0aA849556)
-
-## Features
-
-- Deposit USDC on Optimism or Base
-- Earn optimized yield through AAVE lending protocols across multiple chains, we are working on integrating more protocols
-- Cross-chain transfers for dynamic yield optimization
-- Automated yield rebalancing for maximum returns
-- User-friendly interface for deposits, withdrawals, and yield tracking
-- High-security cross-chain operations using Chainlink's CCIP
-- Affiliate program for user acquisition
 
 ## Architecture
 
