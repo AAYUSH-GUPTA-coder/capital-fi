@@ -44,6 +44,11 @@ This project implements an advanced cross-chain yield aggregator for USDC, curre
 
 [CCIP Explorer](https://ccip.chain.link/address/0x482b052dD873744c3e3722abE50735b0aA849556)
 
+## Contract Indexers
+
+- [Base Goldsky Indexer](https://api.goldsky.com/api/public/project_clznu2pmex4ns01udddn89x8k/subgraphs/aave-v3-base/1.0.0/gn)
+- [Optimism Goldsky Indexer](https://api.goldsky.com/api/public/project_clznu2pmex4ns01udddn89x8k/subgraphs/aave-v3-optimism/1.0.0/gn)
+
 ## Architecture
 
 The system consists of two main smart contracts:

@@ -22,9 +22,8 @@ export default function Hero() {
           Your DeFi <br /> Savings Account
         </h1>
         <p className="text-neutral-600 text-center text-lg">
-          Capital maximizes the interest you earn by{" "}
-          <br className="hidden sm:flex" /> connecting the top crypto apps in
-          one place.
+          The Best Superchain Yield Aggregator <br className="hidden sm:flex" />{" "}
+          Connecting You to the Best Yield Opportunities across OP Stack
         </p>
         <span className="flex gap-4 items-center">
           <Link
