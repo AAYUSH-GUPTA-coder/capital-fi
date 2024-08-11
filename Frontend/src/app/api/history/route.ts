@@ -2,6 +2,8 @@ import Moralis from "moralis";
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { contractAddresses } from "@/lib/constants";
 
+let isMoralisInitialized = false;
+
 export const POST = async (req: Request) => {
   const { address } = await req.json();
 
@@ -11,12 +13,14 @@ export const POST = async (req: Request) => {
     });
   }
 
-  await Moralis.start({
-    apiKey: process.env.MORALIS_API_KEY,
-  });
+  if (!isMoralisInitialized) {
+    await Moralis.start({
+      apiKey: process.env.MORALIS_API_KEY,
+    });
+    isMoralisInitialized = true;
+  }
 
   const contractAddressBaseSepolia = contractAddresses.baseSepolia;
-
   const chain = EvmChain.BASE_SEPOLIA;
 
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
@@ -48,6 +52,7 @@ export const POST = async (req: Request) => {
         amount: transfer.value,
         sender: transfer.from_address,
         receiver: transfer.to_address,
+        network: "Base",
       }));
     })
   );

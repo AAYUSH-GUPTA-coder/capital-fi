@@ -18,7 +18,7 @@ export enum chains {
   "optimism",
 }
 
-export const getUSDCBalance = async (address: string, chain: chains) => {
+export const getUSDCBalance = async (address: `0x${string}`, chain: chains) => {
   if (chain === chains.base) {
     try {
       const response = await fetch(
